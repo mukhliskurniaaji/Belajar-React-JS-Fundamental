@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const root = document.querySelector('#root');
+      
+        function App() {
+            const [activity, setActivity] = React.useState();
+            const [edit, setEdit] = React.useState({});
+            const [todos, setTodos] = React.useState([]);
+            const [message, setMessage] = React.useState("");
+
+            function generateID() {
+                return Date.now();
+            }
+
+            function addTodoHandler(event) {
+                event.preventDefault();
+
+                // Pesan ketika inputan kosong :
+                if (!activity) {
+                    return setMessage("Aktivitas belum ditambahkan")
+                }
+
+                // Logic untuk Edit :
+                if (edit.id) {
+                    const updatedTodo = {
+                        id : edit.id,
+                        activity: activity,
+                    }
+
+                    // Mendapatkan index yang akan diedit :
+                    const editTodoIndex= todos.findIndex(function (todo) {
+                        return todo.id==edit.id
+                    });
+
+                    const updatedTodos = [...todos];
+                    // data diatas berarti mengkloning todos ke dalam updatedTodos
+
+                    updatedTodos[editTodoIndex]=updatedTodo;
+                    // kode di atas berarti mengedit updatedTodos dengan index editTodoIndex menjadi updatedTodo.
+
+                    setTodos(updatedTodos);
+                    // mengeset todos dengan updatedTodos
+
+                    return cacleEditHandler();
+                    // setelah selesai edit, dikembalikan ke mode tambah (cancel edit)
+                }
+
+                setTodos([
+                    ...todos,
+                    {
+                        id : generateID(),
+                        activity,
+                    },
+                ]) ;
+                // kode di atas berarti mengeset object, dengan ID dari function generateID
+               
+                setActivity('');
+                // kode diatas berarti mengeset actifity menjadi kosong kembali (mereset)
+            
+                setMessage('');
+                 // kode diatas berarti mengeset actifity menjadi kosong kembali
+            }
+
+            function removeTodoHandler(todoID) {
+                const filteredTodos = todos.filter(function (todo) {
+                    return todo.id !== todoID;
+                })
+                setTodos(filteredTodos);
+                // mengeset todos dengan yang telah difilter
+
+                if(edit.id) cacleEditHandler();
+                 // setelah selesai remove, dikembalikan ke mode tambah (cancel edit)
+            }
+
+            function editTodoHandler(todo) {
+                setActivity(todo.activity); //mengeset ke tampilan edit
+                setEdit(todo);
+                console.log(edit);
+            }
+
+            function cacleEditHandler() {
+                setEdit({});
+                setActivity('');
+            }
+
+            return(
+                <>
+                    <h1>Simple Todo List</h1>
+
+                    {message && <i style={{color: 'red'}}>{message}</i>}
+                                        
+                    <form onSubmit={addTodoHandler}>
+                        <input 
+                            type='text'
+                            placeholder='aktivitas'
+                            value={activity}
+                            onChange={function(event){
+                                setActivity(event.target.value);
+                            }}
+                            
+                        />
+                        <button type="submit">{edit.id ? "Simpan":'Tambah'}</button>  
+                        {edit.id && <button onClick={cacleEditHandler}>Batal Edit</button>}
+                    </form>
+                    
+                    {todos.length > 0 ?
+                        <ul>
+                            {todos.map(function(todo){
+                                return <li key={todo.id}>{todo.activity}
+                                            <button onClick={editTodoHandler.bind(this, todo)}>Edit</button>
+                                            <button onClick={removeTodoHandler.bind(this, todo.id)}>Hapus</button>    
+                                        </li>
+                            })}
+                        </ul>
+                        :
+                        <p>Todo masih kosong, silahkan ditambahkan !</p>
+                    }
+                </>
+            )
+        
+        }
+        
+        ReactDOM.render(<App />, root);
+    </script>
+
+</body>
+</html>

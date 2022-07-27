@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const root = document.querySelector('#root');
+      
+        function App() {
+            const [activity, setActivity] = React.useState();
+            const [todos, setTodos] = React.useState([]);
+
+            function generateID() {
+                return Date.now();
+            }
+
+            function addTodoHandler(event) {
+                event.preventDefault();
+
+                setTodos([
+                    ...todos,
+                    {
+                        id : generateID(),
+                        activity: activity,
+                    },
+                ]) ;
+                // kode di atas berarti mengeset object, dengan ID dari function generateID
+               
+                setActivity('');
+                // kode diatas berarti mengeset actifity menjadi kosong kembali (mereset)
+            }
+
+            function removeTodoHandler(todoID) {
+                const filteredTodos = todos.filter(function (todo) {
+                    return todo.id !== todoID;
+                })
+                setTodos(filteredTodos);
+                // mengeset todos dengan yang telah difilter
+            }
+
+            return(
+                <>
+                    <h1>Simple Todo List</h1>
+                    <form onSubmit={addTodoHandler}>
+                        <input 
+                            type='text'
+                            placeholder='aktivitas'
+                            value={activity}
+                            onChange={function(event){
+                                setActivity(event.target.value);
+                            }}
+                            
+                        />
+                        <button type="submit">Tambah</button>  
+                    </form>
+                    <ul>
+                        {todos.map(function(todo){
+                            return <li key={todo.id}>{todo.activity}
+                                        <button onClick={removeTodoHandler.bind(this, todo.id)}>
+                                            Hapus</button>    
+                                    </li>
+                        })}
+                    </ul>
+                </>
+            )
+        }
+        
+        ReactDOM.render(<App />, root);
+    </script>
+
+</body>
+</html>

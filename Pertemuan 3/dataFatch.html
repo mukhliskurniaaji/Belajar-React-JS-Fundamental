@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const root = document.querySelector('#root');
+      
+        function App() {
+        const [news, setNews] = React.useState([]);
+        const [loading, setLoading] =React.useState(true);
+
+        // Fetch dengan then
+        /*React.useEffect(function () {
+            const getData = fetch('https://api.spaceflightnewsapi.net/v3/blogs')
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (response) {
+                    setNews(response);
+                });
+        }),[]; // Kurung [] agar pengambilan 1 kali saja*/
+
+        // Fetch dengan async await :
+            React.useEffect(function () {
+                async function getData (){
+                    const request = await fetch(
+                        'https://api.spaceflightnewsapi.net/v3/blogs'
+                    );
+                    const response = await request.json();
+                    setNews(response);
+                    setLoading(false);
+                } 
+                getData()
+            }),[]; // Kurung [] agar pengambilan 1 kali saja
+
+            return (
+                <>
+                    <h1>Data Farch </h1>
+                    {loading ? 
+                        (<i>Loading data...</i>) 
+                        :
+                        ( <ul>
+                            {news.map(function (kabar) {
+                                return <li key= {kabar.id}>{kabar.title}</li>
+                            })}    
+                        </ul> )
+                    }
+                </>
+            )
+            }
+        
+        ReactDOM.render(<App />, root);
+    </script>
+
+</body>
+</html>
